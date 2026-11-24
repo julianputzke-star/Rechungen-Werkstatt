@@ -19,7 +19,7 @@
     tel: '+49 151 28940312',
     email: '', web: '',
     steuernr: '', ustid: '', bank: '', iban: '', bic: '',
-    kleinunternehmer: false,
+    kleinunternehmer: true,
     stundensatz: '95,00',
     mwst: '19',
     zahlungsziel: '14',
@@ -41,6 +41,12 @@
   };
 
   let settings = { ...STANDARD, ...lade(KEY_SETTINGS, {}) };
+  if ((settings.version || 1) < 2) {
+    // Umstellung: Betrieb ist Kleinunternehmer nach § 19 UStG
+    settings.kleinunternehmer = true;
+    settings.version = 2;
+    speichere(KEY_SETTINGS, settings);
+  }
   let archiv = lade(KEY_ARCHIV, []);
   let inv = null;
 
@@ -72,6 +78,7 @@
       fahrzeug: { kennzeichen: '', hersteller: '', modell: '', fin: '', ez: '', km: '', hsn: '', tsn: '', motor: '', annahme: '' },
       arbeiten: [neueArbeit()], teile: [neuesTeil()], sonstiges: [],
       bemerkung: '', unterschrift: true, kundenunterschrift: false, bezahlt: false,
+      kleinunternehmer: !!settings.kleinunternehmer, mwst: settings.mwst,
     };
   }
 
@@ -213,17 +220,21 @@
     const rows = [];
     rows.push(['Arbeitslohn' + (t.stunden ? ` (${dez(t.stunden)} Std.)` : ''), t.lohn]);
     rows.push(['Ersatzteile', t.teileSumme]);
+    // (Beträge sind bei Kleinunternehmern Endbeträge – keine Netto/MwSt.-Zeilen)
     if (t.sonst || inv.sonstiges.length) rows.push(['Sonstiges', t.sonst]);
     let html = rows.map(([l, v]) => `<tr><td>${l}</td><td>${euro(v)}</td></tr>`).join('');
     if (!t.klein) {
       html += `<tr class="sub"><td>Netto</td><td>${euro(t.netto)}</td></tr>`;
       html += `<tr><td>MwSt. ${dez(t.satz, 0, 2)} %</td><td>${euro(t.mwst)}</td></tr>`;
     }
-    html += `<tr class="total"><td>Rechnungsbetrag</td><td>${euro(t.brutto)}</td></tr>`;
+    html += `<tr class="total"><td>${t.klein ? 'Gesamtbetrag' : 'Rechnungsbetrag'}</td><td>${euro(t.brutto)}</td></tr>`;
+    if (t.klein) html += '<tr><td colspan="2" class="muted">Kleinunternehmer § 19 UStG – keine Umsatzsteuer</td></tr>';
     $('#sumTable').innerHTML = html;
 
     const fehlt = [];
-    if (!settings.steuernr && !settings.ustid) fehlt.push('Steuernummer oder USt-IdNr. fehlt (Pflichtangabe) – bitte unter „Einstellungen“ eintragen.');
+    if (!settings.inhaber) fehlt.push('Vor- und Nachname des Inhabers fehlt (Pflicht: vollständiger Name des Unternehmers) – bitte unter „Einstellungen“ eintragen.');
+    if (!t.klein && !settings.steuernr && !settings.ustid) fehlt.push('Steuernummer oder USt-IdNr. fehlt (Pflichtangabe) – bitte unter „Einstellungen“ eintragen.');
+    if (!inv.kunde.strasse || !inv.kunde.plz || !inv.kunde.ort) fehlt.push('Vollständige Anschrift des Kunden fehlt (Pflichtangabe).');
     if (!settings.iban && inv.zahlungsart === 'ueberweisung') fehlt.push('Keine Bankverbindung hinterlegt.');
     if (!inv.kunde.nachname && !inv.kunde.firma) fehlt.push('Name des Rechnungsempfängers fehlt.');
     if (!inv.nr) fehlt.push('Rechnungsnummer fehlt.');
@@ -292,6 +303,7 @@
   $('#btnSpeichern').addEventListener('click', () => archivieren(false));
 
   function archivieren(still) {
+    if (inv.kleinunternehmer === undefined) { inv.kleinunternehmer = !!settings.kleinunternehmer; inv.mwst = settings.mwst; }
     const kopie = JSON.parse(JSON.stringify(inv));
     kopie.gespeichert = new Date().toISOString();
     kopie.summe = berechne(inv, settings).brutto;
@@ -367,7 +379,8 @@
       btn('PDF', () => herunterladen(erstellePdf(r, settings).output('blob'), dateiname(r)));
       btn('Kopie', () => {
         inv = JSON.parse(JSON.stringify(r));
-        Object.assign(inv, { id: uid(), nr: naechsteNr(), datum: heute(), leistungsdatum: heute(), bezahlt: false });
+        Object.assign(inv, { id: uid(), nr: naechsteNr(), datum: heute(), leistungsdatum: heute(), bezahlt: false,
+          kleinunternehmer: !!settings.kleinunternehmer, mwst: settings.mwst });
         inv.fahrzeug.km = '';
         formularFuellen(); geaendert(); $('.tab[data-tab="rechnung"]').click();
         toast('Kopie als neue Rechnung angelegt');
@@ -412,12 +425,20 @@
     });
     $('#logoPreview').src = settings.logo || '';
     $('#brandName').textContent = settings.firma || 'Werkstatt';
+    $('[data-s="mwst"]').disabled = !!settings.kleinunternehmer;
   }
   $$('[data-s]').forEach((el) => {
     const ev = el.type === 'checkbox' || el.tagName === 'SELECT' ? 'change' : 'input';
     el.addEventListener(ev, () => {
       settings[el.dataset.s] = el.type === 'checkbox' ? el.checked : el.value;
       speichere(KEY_SETTINGS, settings);
+      if (el.dataset.s === 'kleinunternehmer' || el.dataset.s === 'mwst') {
+        // gilt für die Rechnung in Bearbeitung; archivierte Rechnungen behalten ihren Status
+        inv.kleinunternehmer = !!settings.kleinunternehmer;
+        inv.mwst = settings.mwst;
+        $('[data-s="mwst"]').disabled = !!settings.kleinunternehmer;
+        geaendert();
+      }
       $('#brandName').textContent = settings.firma || 'Werkstatt';
       aktualisiereSummen();
     });

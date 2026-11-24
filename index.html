@@ -167,7 +167,7 @@
     <div class="grid g4">
       <label class="span2">Firmenname<input data-s="firma"></label>
       <label class="span2">Zusatz<input data-s="zusatz"></label>
-      <label class="span2">Inhaber<input data-s="inhaber"></label>
+      <label class="span2">Inhaber (Vor- und Nachname, Pflicht)<input data-s="inhaber" placeholder="Vorname Putzke"></label>
       <label class="span2">Straße, Nr.<input data-s="strasse"></label>
       <label>PLZ<input data-s="plz"></label>
       <label>Ort<input data-s="ort"></label>
@@ -183,22 +183,23 @@
   </div>
 
   <div class="card">
-    <h2>Steuer &amp; Bank <small>(Pflichtangaben nach § 14 UStG)</small></h2>
+    <h2>Steuer &amp; Bank</h2>
+    <p class="muted">Als Kleinunternehmer (§ 19 UStG) darf auf der Rechnung <b>keine</b> Umsatzsteuer ausgewiesen werden – sonst wird sie trotzdem fällig (§ 14c UStG). Ist der Haken gesetzt, erscheint automatisch der vorgeschriebene Hinweis. Die Steuernummer ist für Kleinunternehmer-Rechnungen nicht Pflicht, wird aber empfohlen.</p>
     <div class="grid g4">
       <label class="span2">Steuernummer<input data-s="steuernr"></label>
       <label class="span2">USt-IdNr.<input data-s="ustid"></label>
       <label class="span2">Bank<input data-s="bank"></label>
       <label class="span2">IBAN<input data-s="iban"></label>
       <label class="span2">BIC<input data-s="bic"></label>
-      <label class="span2 chk"><input type="checkbox" data-s="kleinunternehmer"> Kleinunternehmer nach § 19 UStG (keine MwSt.)</label>
+      <label class="span2 chk"><input type="checkbox" data-s="kleinunternehmer"> Kleinunternehmer nach § 19 UStG – keine Umsatzsteuer ausweisen</label>
     </div>
   </div>
 
   <div class="card">
     <h2>Voreinstellungen</h2>
     <div class="grid g4">
-      <label>Stundensatz netto €<input data-s="stundensatz" inputmode="decimal"></label>
-      <label>MwSt.-Satz %<input data-s="mwst" inputmode="decimal"></label>
+      <label>Stundensatz €<input data-s="stundensatz" inputmode="decimal"></label>
+      <label>MwSt.-Satz % <small>(nur ohne § 19)</small><input data-s="mwst" inputmode="decimal"></label>
       <label>Zahlungsziel (Tage)<input data-s="zahlungsziel" inputmode="numeric"></label>
       <label>Nummern-Präfix<input data-s="nrPrefix" placeholder="z. B. RE-"></label>
       <label>Letzte vergebene Nr.<input data-s="letzteNr" inputmode="numeric"></label>

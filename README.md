@@ -20,7 +20,7 @@ Man muss nichts installieren und braucht keinen Server. Tipp: Ein Lesezeichen au
   - *Ersatzteile*: Teile-Nr., Bezeichnung, Menge, Einheit, Einzelpreis
   - *Sonstiges*: Öl, Kleinmaterial, Entsorgung, Fremdleistungen usw.
   - Rabatt in % pro Position möglich. Die Spalte erscheint nur, wenn ein Rabatt vergeben wurde.
-- **Summen**: Netto, MwSt. (Satz einstellbar), Rechnungsbetrag. Für Kleinunternehmer nach § 19 UStG gibt es einen Schalter.
+- **Kleinunternehmer nach § 19 UStG** (voreingestellt): Die Rechnung zeigt nur den Gesamtbetrag, keine Umsatzsteuer, und trägt automatisch den vorgeschriebenen Hinweis. Wer später umsatzsteuerpflichtig wird, schaltet das in den Einstellungen um. Dann erscheinen Netto, MwSt. und Rechnungsbetrag. Jede Rechnung speichert ihren Steuerstatus, alte Rechnungen bleiben also unverändert.
 - **Zahlungsart**: Überweisung (mit Fälligkeitsdatum), bar oder Karte. Der passende Text kommt automatisch auf die Rechnung.
 - **Unterschrift und Stempel**: Feld unten auf der Rechnung, abschaltbar. Optional zusätzlich „Fahrzeug übernommen – Unterschrift Kunde“.
 - **Live-Vorschau** des PDF neben dem Formular
@@ -41,12 +41,31 @@ Das Layout folgt dem, was bei Werkstatt-Rechnungen in Deutschland üblich ist (F
 | Infoblock rechts | Rechnungs-Nr., Rechnungsdatum, Leistungsdatum, Kunden-Nr., Auftrags-Nr. |
 | Fahrzeugblock | Kennzeichen, Fahrzeug, FIN, EZ, km-Stand, HSN/TSN, Motorcode, Annahme |
 | Positionen | Arbeitslohn, Ersatzteile, Sonstiges, jeweils mit Zwischensumme |
-| Summen | Nettobetrag, MwSt., Rechnungsbetrag (hervorgehoben) |
+| Summen | Gesamtbetrag mit Hinweis „Gemäß § 19 UStG wird keine Umsatzsteuer berechnet“ (bei Regelbesteuerung: Netto, MwSt., Rechnungsbetrag) |
 | Texte | Zahlungshinweis, Bemerkung, Dankes-/Gewährleistungstext |
 | Unterschrift | Ort/Datum und Linie für Unterschrift und Stempel |
 | Fußzeile | Inhaber, Kontakt, Bankverbindung, Steuernummer/USt-IdNr., Seitenzahl |
 
-Pflichtangaben nach § 14 Abs. 4 UStG, die das Programm abdeckt: vollständiger Name und Anschrift von Werkstatt und Kunde, Steuernummer oder USt-IdNr., Rechnungsdatum, fortlaufende Rechnungsnummer, Menge und Art der Leistung, Leistungsdatum, Entgelt nach Steuersätzen, Steuersatz und Steuerbetrag (bzw. der Hinweis auf § 19 UStG). Fehlt eine Angabe, erscheint rechts im Programm ein Warnhinweis.
+## Steuerliches (Kleinunternehmer)
+
+Eine Rechnung eines Kleinunternehmers muss nach § 34a UStDV mindestens enthalten:
+
+1. vollständigen Namen und Anschrift von Werkstatt **und** Kunde. Bei einem Einzelunternehmen gehört der Vor- und Nachname des Inhabers dazu, der Firmenname allein reicht nicht. Darum unbedingt das Feld **Inhaber** ausfüllen.
+2. Ausstellungsdatum
+3. Menge und Art der Teile bzw. Umfang und Art der Arbeiten
+4. den Betrag und den **Hinweis auf die Steuerbefreiung nach § 19 UStG**
+
+Das Programm setzt zusätzlich eine fortlaufende Rechnungsnummer, das Leistungsdatum und (falls eingetragen) die Steuernummer auf die Rechnung. Das ist nicht vorgeschrieben, aber üblich und sinnvoll. Fehlt eine Pflichtangabe, erscheint rechts im Programm ein Warnhinweis.
+
+Wichtig:
+
+- **Niemals Umsatzsteuer ausweisen.** Wer als Kleinunternehmer „MwSt.“ auf die Rechnung schreibt, schuldet sie dem Finanzamt trotzdem (§ 14c UStG).
+- Die Beträge sind **Endbeträge**, keine Nettobeträge. Deshalb steht auf der Rechnung „Gesamtbetrag“ und nirgends „netto“ oder „brutto“.
+- Teile werden inklusive MwSt. eingekauft, und Kleinunternehmer können sich diese Vorsteuer nicht erstatten lassen. Die Verkaufspreise der Teile also auf Basis des **Brutto-Einkaufspreises** kalkulieren.
+- Umsatzgrenzen seit 2025: Vorjahr höchstens 25.000 €, laufendes Jahr höchstens 100.000 €. Bei mehr als 100.000 € im laufenden Jahr endet die Regelung sofort.
+- E-Rechnung: Kleinunternehmer dürfen weiter PDF-Rechnungen schreiben, müssen aber E-Rechnungen von Lieferanten empfangen können.
+
+Das ist keine Steuerberatung. Im Zweifel bitte kurz mit dem Steuerberater abstimmen.
 
 ## Wichtig zur Datenspeicherung
 

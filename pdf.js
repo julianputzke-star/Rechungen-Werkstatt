@@ -40,8 +40,10 @@
     const sum = (arr) => runde(arr.reduce((a, p) => a + p.gesamt, 0));
     const lohn = sum(arbeiten), teileSumme = sum(teile), sonst = sum(sonstiges);
     const netto = runde(lohn + teileSumme + sonst);
-    const klein = !!s.kleinunternehmer;
-    const satz = klein ? 0 : zahl(s.mwst);
+    // Steuerstatus wird mit der Rechnung gespeichert, damit alte Rechnungen
+    // auch nach einem Wechsel der Besteuerung unverändert ausgegeben werden.
+    const klein = inv.kleinunternehmer !== undefined ? !!inv.kleinunternehmer : !!s.kleinunternehmer;
+    const satz = klein ? 0 : zahl(inv.mwst !== undefined ? inv.mwst : s.mwst);
     const mwst = runde(netto * satz / 100);
     const stunden = arbeiten.reduce((a, p) => a + zahl(p.std), 0);
     return { arbeiten, teile, sonstiges, lohn, teileSumme, sonst, netto, satz, mwst, brutto: runde(netto + mwst), klein, stunden };
@@ -83,6 +85,7 @@
     doc.setFontSize(9);
     doc.setFont('helvetica', 'normal');
     const kontakt = [
+      s.inhaber ? `Inhaber: ${s.inhaber}` : '',
       s.strasse,
       [s.plz, s.ort].filter(Boolean).join(' '),
       s.tel ? `Tel.: ${s.tel}` : '',
@@ -277,24 +280,33 @@
     doc.setTextColor(255);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(11);
-    doc.text('Rechnungsbetrag', sx, y + 5.6);
+    doc.text(t.klein ? 'Gesamtbetrag' : 'Rechnungsbetrag', sx, y + 5.6);
     doc.text(euro(t.brutto), R - 1.5, y + 5.6, { align: 'right' });
-    y += 15;
+    y += 8;
+    if (t.klein) {
+      // Pflichthinweis direkt unter dem Betrag (§ 34a UStDV)
+      doc.setTextColor(20);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      doc.text('Gemäß § 19 UStG wird keine Umsatzsteuer berechnet (Kleinunternehmerregelung).', R, y + 4, { align: 'right' });
+      y += 4;
+    }
+    y += 7;
 
     // ---------- Texte ----------
     doc.setTextColor(20);
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(9.5);
     const texte = [];
-    if (t.klein) texte.push('Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.');
     if (!inv.leistungsdatum) texte.push('Das Leistungsdatum entspricht dem Rechnungsdatum.');
-    if (inv.zahlungsart === 'bar') texte.push('Der Rechnungsbetrag wurde in bar dankend erhalten.');
-    else if (inv.zahlungsart === 'karte') texte.push('Der Rechnungsbetrag wurde per EC-/Kartenzahlung beglichen.');
+    const betragWort = t.klein ? 'Gesamtbetrag' : 'Rechnungsbetrag';
+    if (inv.zahlungsart === 'bar') texte.push(`Der ${betragWort} wurde in bar dankend erhalten.`);
+    else if (inv.zahlungsart === 'karte') texte.push(`Der ${betragWort} wurde per EC-/Kartenzahlung beglichen.`);
     else {
       const ziel = parseInt(inv.zahlungsziel, 10);
       texte.push(ziel > 0
-        ? `Bitte überweisen Sie den Rechnungsbetrag ohne Abzug bis zum ${datumDE(plusTage(inv.datum, ziel))} unter Angabe der Rechnungsnummer auf das unten genannte Konto.`
-        : 'Der Rechnungsbetrag ist sofort ohne Abzug fällig. Bitte geben Sie bei der Überweisung die Rechnungsnummer an.');
+        ? `Bitte überweisen Sie den ${betragWort} ohne Abzug bis zum ${datumDE(plusTage(inv.datum, ziel))} unter Angabe der Rechnungsnummer auf das unten genannte Konto.`
+        : `Der ${betragWort} ist sofort ohne Abzug fällig. Bitte geben Sie bei der Überweisung die Rechnungsnummer an.`);
     }
     const bloecke = [texte.join('\n')];
     if (inv.bemerkung) bloecke.push(inv.bemerkung);
