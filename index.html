@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Werkstatt-Rechnungen</title>
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1f3a5f">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Rechnungen">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><span id="brandName">Putzke KFZ-Technik</span> <small>Rechnungsprogramm</small></div>
+  <nav>
+    <button class="tab active" data-tab="rechnung">Rechnung</button>
+    <button class="tab" data-tab="archiv">Archiv</button>
+    <button class="tab" data-tab="einstellungen">Einstellungen</button>
+    <button class="tab install hidden" id="btnInstall" title="Programm als App auf diesem Gerät installieren">⬇ Als App installieren</button>
+  </nav>
+</header>
+
+<main>
+<!-- ================= RECHNUNG ================= -->
+<section id="tab-rechnung" class="tabpane active">
+  <div class="layout">
+    <div class="formcol">
+      <div class="toolbar">
+        <button id="btnNeu">+ Neue Rechnung</button>
+        <label class="search">Stammkunde/Fahrzeug übernehmen:
+          <input id="kundenSuche" list="kundenListe" placeholder="Kennzeichen oder Name …">
+          <datalist id="kundenListe"></datalist>
+        </label>
+      </div>
+
+      <div class="card">
+        <h2>Rechnungsdaten</h2>
+        <div class="grid g4">
+          <label>Rechnungs-Nr.<input id="r_nr"></label>
+          <label>Rechnungsdatum<input id="r_datum" type="date"></label>
+          <label>Leistungsdatum<input id="r_leistungsdatum" type="date"></label>
+          <label>Kunden-Nr.<input id="r_kundennr"></label>
+          <label>Auftrags-Nr.<input id="r_auftragsnr"></label>
+          <label>Zahlungsart
+            <select id="r_zahlungsart">
+              <option value="ueberweisung">Überweisung</option>
+              <option value="bar">Bar bezahlt</option>
+              <option value="karte">EC-/Kartenzahlung</option>
+            </select>
+          </label>
+          <label>Zahlungsziel (Tage)<input id="r_zahlungsziel" inputmode="numeric"></label>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Fahrzeughalter / Rechnungsempfänger</h2>
+        <div class="grid g4">
+          <label>Anrede
+            <select id="k_anrede"><option></option><option>Herr</option><option>Frau</option><option>Firma</option></select>
+          </label>
+          <label class="span3">Firma (optional)<input id="k_firma"></label>
+          <label class="span2">Vorname<input id="k_vorname"></label>
+          <label class="span2">Nachname<input id="k_nachname"></label>
+          <label class="span2">Straße, Nr.<input id="k_strasse"></label>
+          <label>PLZ<input id="k_plz" inputmode="numeric"></label>
+          <label>Ort<input id="k_ort"></label>
+          <label class="span2">Telefon<input id="k_tel"></label>
+          <label class="span2">E-Mail<input id="k_email"></label>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Fahrzeugdaten</h2>
+        <div class="grid g4">
+          <label>Amtl. Kennzeichen<input id="f_kennzeichen" placeholder="M-AB 1234"></label>
+          <label>Hersteller<input id="f_hersteller" placeholder="VW"></label>
+          <label class="span2">Modell / Typ<input id="f_modell" placeholder="Golf VII 1.6 TDI"></label>
+          <label class="span2">Fahrgestell-Nr. (FIN)<input id="f_fin" maxlength="17" placeholder="17-stellig"></label>
+          <label>Erstzulassung<input id="f_ez" placeholder="TT.MM.JJJJ"></label>
+          <label>km-Stand<input id="f_km" inputmode="numeric"></label>
+          <label>HSN (Schlüssel 2.1)<input id="f_hsn" maxlength="4"></label>
+          <label>TSN (Schlüssel 2.2)<input id="f_tsn" maxlength="3"></label>
+          <label>Motorcode<input id="f_motor"></label>
+          <label>Fahrzeugannahme<input id="f_annahme" type="date"></label>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Arbeitslohn</h2>
+        <table class="pos">
+          <thead><tr><th>Arbeits-Nr.</th><th class="wide">Beschreibung der Arbeit</th><th>Std.</th><th>Stundensatz €</th><th>Rabatt %</th><th>Gesamt</th><th></th></tr></thead>
+          <tbody id="arbeitenBody"></tbody>
+        </table>
+        <button class="add" data-add="arbeiten">+ Arbeitsposition</button>
+      </div>
+
+      <div class="card">
+        <h2>Ersatzteile</h2>
+        <table class="pos">
+          <thead><tr><th>Teile-Nr.</th><th class="wide">Bezeichnung</th><th>Menge</th><th>Einheit</th><th>Einzelpreis €</th><th>Rabatt %</th><th>Gesamt</th><th></th></tr></thead>
+          <tbody id="teileBody"></tbody>
+        </table>
+        <button class="add" data-add="teile">+ Ersatzteil</button>
+      </div>
+
+      <div class="card">
+        <h2>Sonstiges <small>(Betriebsstoffe, Kleinmaterial, Entsorgung, Fremdleistungen …)</small></h2>
+        <table class="pos">
+          <thead><tr><th>Nr.</th><th class="wide">Bezeichnung</th><th>Menge</th><th>Einheit</th><th>Einzelpreis €</th><th>Rabatt %</th><th>Gesamt</th><th></th></tr></thead>
+          <tbody id="sonstigesBody"></tbody>
+        </table>
+        <button class="add" data-add="sonstiges">+ Position</button>
+      </div>
+
+      <div class="card">
+        <h2>Hinweise &amp; Abschluss</h2>
+        <label>Bemerkung auf der Rechnung (optional)<textarea id="r_bemerkung" rows="3" placeholder="z. B. Nächster Service bei 150.000 km. Altteile wurden auf Wunsch entsorgt."></textarea></label>
+        <div class="checks">
+          <label class="chk"><input type="checkbox" id="r_unterschrift"> Feld für Unterschrift &amp; Stempel</label>
+          <label class="chk"><input type="checkbox" id="r_kundenunterschrift"> Feld „Fahrzeug übernommen“ (Unterschrift Kunde)</label>
+        </div>
+      </div>
+    </div>
+
+    <aside class="sidecol">
+      <div class="card sticky">
+        <h2>Summen</h2>
+        <table class="sums" id="sumTable"></table>
+        <div class="actions">
+          <button class="primary" id="btnPdf">PDF erstellen &amp; speichern</button>
+          <button id="btnSpeichern">Im Archiv speichern</button>
+          <button id="btnVorschau">Vorschau aktualisieren</button>
+        </div>
+        <p id="hinweisBox" class="warn hidden"></p>
+        <p id="saveInfo" class="muted"></p>
+      </div>
+      <div class="card preview">
+        <iframe id="vorschau" title="PDF-Vorschau"></iframe>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<!-- ================= ARCHIV ================= -->
+<section id="tab-archiv" class="tabpane">
+  <div class="card">
+    <div class="toolbar">
+      <h2>Gespeicherte Rechnungen</h2>
+      <input id="archivFilter" placeholder="Suchen (Nr., Name, Kennzeichen) …">
+    </div>
+    <table class="list">
+      <thead><tr><th>Nr.</th><th>Datum</th><th>Kunde</th><th>Fahrzeug</th><th class="r">Betrag</th><th>Status</th><th></th></tr></thead>
+      <tbody id="archivBody"></tbody>
+    </table>
+    <p class="muted" id="archivLeer">Noch keine Rechnungen gespeichert.</p>
+  </div>
+  <div class="card">
+    <h2>Datensicherung</h2>
+    <p class="muted">Alle Daten werden nur hier im Browser auf diesem Computer gespeichert. Bitte regelmäßig eine Sicherung als Datei anlegen (z. B. auf USB-Stick oder in die Cloud).</p>
+    <div class="actions row">
+      <button id="btnExport">Sicherung herunterladen (.json)</button>
+      <label class="button">Sicherung einspielen<input type="file" id="importFile" accept=".json,application/json" hidden></label>
+    </div>
+  </div>
+</section>
+
+<!-- ================= EINSTELLUNGEN ================= -->
+<section id="tab-einstellungen" class="tabpane">
+  <div class="card">
+    <h2>Firmendaten (Briefkopf)</h2>
+    <div class="grid g4">
+      <label class="span2">Firmenname<input data-s="firma"></label>
+      <label class="span2">Zusatz<input data-s="zusatz"></label>
+      <label class="span2">Inhaber (Vor- und Nachname, Pflicht)<input data-s="inhaber" placeholder="Julian Putzke"></label>
+      <label class="span2">Straße, Nr.<input data-s="strasse"></label>
+      <label>PLZ<input data-s="plz"></label>
+      <label>Ort<input data-s="ort"></label>
+      <label class="span2">Telefon<input data-s="tel"></label>
+      <label class="span2">E-Mail<input data-s="email"></label>
+      <label class="span2">Webseite<input data-s="web"></label>
+    </div>
+    <div class="logo-row">
+      <label class="button">Logo hochladen (PNG/JPG)<input type="file" id="logoFile" accept="image/png,image/jpeg" hidden></label>
+      <img id="logoPreview" alt="">
+      <button id="logoEntfernen" class="small">Logo entfernen</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Steuer &amp; Bank</h2>
+    <p class="muted">Als Kleinunternehmer (§ 19 UStG) darf auf der Rechnung <b>keine</b> Umsatzsteuer ausgewiesen werden – sonst wird sie trotzdem fällig (§ 14c UStG). Ist der Haken gesetzt, erscheint automatisch der vorgeschriebene Hinweis. Die Steuernummer ist für Kleinunternehmer-Rechnungen nicht Pflicht, wird aber empfohlen.</p>
+    <div class="grid g4">
+      <label class="span2">Steuernummer<input data-s="steuernr"></label>
+      <label class="span2">USt-IdNr.<input data-s="ustid"></label>
+      <label class="span2">Bank<input data-s="bank"></label>
+      <label class="span2">IBAN<input data-s="iban"></label>
+      <label class="span2">BIC<input data-s="bic"></label>
+      <label class="span2 chk"><input type="checkbox" data-s="kleinunternehmer"> Kleinunternehmer nach § 19 UStG – keine Umsatzsteuer ausweisen</label>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Voreinstellungen</h2>
+    <div class="grid g4">
+      <label>Stundensatz €<input data-s="stundensatz" inputmode="decimal"></label>
+      <label>MwSt.-Satz % <small>(nur ohne § 19)</small><input data-s="mwst" inputmode="decimal"></label>
+      <label>Zahlungsziel (Tage)<input data-s="zahlungsziel" inputmode="numeric"></label>
+      <label>Nummern-Präfix<input data-s="nrPrefix" placeholder="z. B. RE-"></label>
+      <label>Letzte vergebene Nr.<input data-s="letzteNr" inputmode="numeric"></label>
+      <label class="span3">Nummernformat
+        <select data-s="nrFormat">
+          <option value="jahr">Jahr + laufende Nr. (2026-0001)</option>
+          <option value="fortlaufend">nur fortlaufend (10001)</option>
+        </select>
+      </label>
+      <label class="span4">Einleitungstext<input data-s="einleitung"></label>
+      <label class="span4">Schlusstext<textarea data-s="schlusstext" rows="2"></textarea></label>
+    </div>
+  </div>
+  <p class="muted">Änderungen werden automatisch gespeichert.</p>
+</section>
+</main>
+
+<div id="mobileBar" class="mobilebar">
+  <div><small>Gesamt</small><b id="mobileSumme">0,00 €</b></div>
+  <button id="mBtnSpeichern">Speichern</button>
+  <button class="primary" id="mBtnPdf">PDF erstellen</button>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script src="vendor/jspdf.umd.min.js"></script>
+<script src="vendor/jspdf.plugin.autotable.min.js"></script>
+<script src="pdf.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
