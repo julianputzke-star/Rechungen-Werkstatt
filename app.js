@@ -1,7 +1,7 @@
 /* Werkstatt-Rechnungen – Oberfläche, Speicherung, Archiv */
 (function () {
   'use strict';
-  const { erstellePdf, berechne, zahl, euro, dez, datumDE } = window.RechnungPDF;
+  const { erstellePdf, berechne, leer, zahl, euro, dez, datumDE } = window.RechnungPDF;
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 
@@ -128,9 +128,9 @@
 
   // ---------- Positionen ----------
   const SPALTEN = {
-    arbeiten: [['nr', 'text'], ['bez', 'text', 'vorschlagArbeit'], ['std', 'num'], ['satz', 'num'], ['rabatt', 'num']],
+    arbeiten: [['bez', 'text', 'vorschlagArbeit'], ['std', 'num'], ['satz', 'num'], ['rabatt', 'num']],
     teile: [['nr', 'text'], ['bez', 'text', 'vorschlagTeil'], ['menge', 'num'], ['einheit', 'einheit'], ['preis', 'num'], ['rabatt', 'num']],
-    sonstiges: [['nr', 'text'], ['bez', 'text', 'vorschlagSonst'], ['menge', 'num'], ['einheit', 'einheit'], ['preis', 'num'], ['rabatt', 'num']],
+    sonstiges: [['bez', 'text', 'vorschlagSonst'], ['menge', 'num'], ['einheit', 'einheit'], ['preis', 'num'], ['rabatt', 'num']],
   };
   const EINHEITEN = ['Stk.', 'Satz', 'Liter', 'ml', 'kg', 'm', 'Paar', 'psch.', 'Std.'];
 
@@ -159,6 +159,9 @@
       tbody.innerHTML = '';
       inv[art].forEach((p, i) => {
         const tr = document.createElement('tr');
+        const posTd = document.createElement('td');
+        posTd.className = 'posnr';
+        tr.appendChild(posTd);
         SPALTEN[art].forEach(([feld, typ, liste]) => {
           const td = document.createElement('td');
           const inp = document.createElement('input');
@@ -173,7 +176,7 @@
             if (feld === 'bez') {
               const v = window.__vorschlag && window.__vorschlag[art].get(inp.value);
               if (v) { // bekannte Position: Werte übernehmen
-                ['nr', 'satz', 'preis', 'einheit', 'std'].forEach((k) => { if (v[k] !== undefined && v[k] !== '' && (k !== 'std' || !p.std)) p[k] = v[k]; });
+                (art === 'teile' ? ['nr', 'preis', 'einheit'] : ['satz', 'preis', 'einheit', 'std']).forEach((k) => { if (v[k] !== undefined && v[k] !== '' && (k !== 'std' || !p.std)) p[k] = v[k]; });
                 positionenZeichnen();
                 const neu = document.getElementById(art + 'Body').children[i].querySelector('[data-feld="bez"]');
                 neu.focus(); neu.setSelectionRange(neu.value.length, neu.value.length);
@@ -196,6 +199,20 @@
         tr.appendChild(del);
         tbody.appendChild(tr);
         zeileSumme(art, i, tr);
+      });
+    });
+    nummerieren();
+  }
+
+  // Positionsnummern wie auf der PDF: fortlaufend über alle Blöcke, leere Zeilen zählen nicht
+  function nummerieren() {
+    const t = berechne(inv, settings);
+    let n = 0;
+    ['arbeiten', 'teile', 'sonstiges'].forEach((art) => {
+      const zeilen = document.getElementById(art + 'Body').children;
+      t[art].forEach((p, i) => {
+        const td = zeilen[i] && zeilen[i].querySelector('.posnr');
+        if (td) td.textContent = leer(p) ? '' : String(++n);
       });
     });
   }
@@ -251,6 +268,7 @@
   let entwurfTimer, vorschauTimer;
   function geaendert() {
     aktualisiereSummen();
+    nummerieren();
     clearTimeout(entwurfTimer);
     entwurfTimer = setTimeout(() => speichere(KEY_ENTWURF, inv), 400);
     vorschauBald();

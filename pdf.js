@@ -49,7 +49,7 @@
     return { arbeiten, teile, sonstiges, lohn, teileSumme, sonst, netto, satz, mwst, brutto: runde(netto + mwst), klein, stunden };
   }
 
-  const leer = (p) => !String(p.bez || '').trim() && !zahl(p.preis) && !zahl(p.satz);
+  const leer = (p) => !String(p.bez || '').trim() && !p.gesamt;
 
   function erstellePdf(inv, s) {
     const { jsPDF } = global.jspdf;
@@ -193,7 +193,8 @@
     // ---------- Positionen ----------
     const allePos = [...t.arbeiten, ...t.teile, ...t.sonstiges].filter((p) => !leer(p));
     const zeigeRabatt = allePos.some((p) => zahl(p.rabatt) > 0);
-    const zeigeNr = allePos.some((p) => String(p.nr || '').trim());
+    // Art.-Nr.-Spalte nur für Teilenummern; Arbeiten/Sonstiges werden über "Pos" automatisch nummeriert
+    const zeigeNr = t.teile.filter((p) => !leer(p)).some((p) => String(p.nr || '').trim());
     const head = ['Pos', 'Art.-Nr.', 'Bezeichnung', 'Menge', 'Einh.', 'Einzelpreis'];
     if (zeigeRabatt) head.push('Rabatt');
     head.push('Gesamt');
@@ -218,13 +219,13 @@
       ]);
     };
     abschnitt('Arbeitslohn', t.arbeiten,
-      (a) => ({ nr: a.nr, bez: a.bez, menge: dez(zahl(a.std)), einheit: 'Std.', preis: a.satz }),
+      (a) => ({ nr: '', bez: a.bez, menge: dez(zahl(a.std)), einheit: 'Std.', preis: a.satz }),
       'Summe Arbeitslohn', t.lohn);
     abschnitt('Ersatzteile', t.teile,
       (p) => ({ nr: p.nr, bez: p.bez, menge: dez(zahl(p.menge), 0, 2), einheit: p.einheit, preis: p.preis }),
       'Summe Ersatzteile', t.teileSumme);
     abschnitt('Sonstiges / Material', t.sonstiges,
-      (p) => ({ nr: p.nr, bez: p.bez, menge: dez(zahl(p.menge), 0, 2), einheit: p.einheit, preis: p.preis }),
+      (p) => ({ nr: '', bez: p.bez, menge: dez(zahl(p.menge), 0, 2), einheit: p.einheit, preis: p.preis }),
       'Summe Sonstiges', t.sonst);
 
     const colStyles = {
@@ -409,5 +410,5 @@
     doc.text(`Seite ${seite} von ${seiten}`, R, 291, { align: 'right' });
   }
 
-  global.RechnungPDF = { erstellePdf, berechne, zahl, euro, dez, datumDE, plusTage, runde };
+  global.RechnungPDF = { erstellePdf, berechne, leer, zahl, euro, dez, datumDE, plusTage, runde };
 })(window);
