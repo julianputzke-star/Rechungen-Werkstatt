@@ -12,7 +12,7 @@
   const STANDARD = {
     firma: 'Putzke KFZ-Technik',
     zusatz: 'Meisterbetrieb',
-    inhaber: '',
+    inhaber: 'Julian Putzke',
     strasse: 'Waldheimstr. 18',
     plz: '82166',
     ort: 'Gräfelfing',
@@ -47,6 +47,7 @@
     settings.version = 2;
     speichere(KEY_SETTINGS, settings);
   }
+  if (!settings.inhaber) { settings.inhaber = STANDARD.inhaber; speichere(KEY_SETTINGS, settings); }
   let archiv = lade(KEY_ARCHIV, []);
   let inv = null;
 
