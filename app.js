@@ -480,6 +480,31 @@
     toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
   }
 
+  // ---------- App-Installation & Offline ----------
+  if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+    navigator.serviceWorker.register('sw.js').catch((e) => console.warn('Service Worker:', e));
+  }
+  // Browser bitten, die Daten dauerhaft zu behalten (nicht automatisch löschen)
+  if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
+  // Entwurf sofort sichern, wenn die App geschlossen oder in den Hintergrund gelegt wird
+  const entwurfJetzt = () => { clearTimeout(entwurfTimer); speichere(KEY_ENTWURF, inv); };
+  window.addEventListener('pagehide', entwurfJetzt);
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') entwurfJetzt(); });
+  let installEvent = null;
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    installEvent = e;
+    $('#btnInstall').classList.remove('hidden');
+  });
+  $('#btnInstall').addEventListener('click', async () => {
+    if (!installEvent) return;
+    installEvent.prompt();
+    await installEvent.userChoice;
+    installEvent = null;
+    $('#btnInstall').classList.add('hidden');
+  });
+  window.addEventListener('appinstalled', () => toast('App installiert – sie ist jetzt auf dem Startbildschirm bzw. im Startmenü.'));
+
   // ---------- Start ----------
   inv = lade(KEY_ENTWURF, null) || neueRechnung();
   ['arbeiten', 'teile', 'sonstiges'].forEach((k) => { if (!Array.isArray(inv[k])) inv[k] = []; });

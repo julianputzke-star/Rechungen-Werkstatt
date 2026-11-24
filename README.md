@@ -4,11 +4,23 @@ Ein Rechnungsprogramm für KFZ-Werkstätten. Es läuft komplett im Browser, auch
 
 ## Starten
 
+### Variante A: Am Computer direkt aus dem Ordner
 1. Den Ordner herunterladen (bei GitHub: „Code“ → „Download ZIP“) und entpacken.
 2. **`index.html` doppelt anklicken.** Das Programm öffnet sich im Browser (Chrome, Edge oder Firefox).
-3. Beim ersten Start unter **Einstellungen** einmal Steuernummer, Bankverbindung, E-Mail und Stundensatz eintragen (und optional ein Logo hochladen).
+3. Tipp: Eine Verknüpfung zur `index.html` auf den Desktop legen.
 
-Man muss nichts installieren und braucht keinen Server. Tipp: Ein Lesezeichen auf die `index.html` anlegen.
+### Variante B: Als App installieren (Computer, Handy, Tablet)
+Dafür muss das Programm unter einer Internetadresse liegen, z. B. über GitHub Pages. Danach:
+- **Windows/Mac (Chrome oder Edge):** Adresse öffnen und oben auf **„⬇ Als App installieren“** oder auf das Installieren-Symbol in der Adressleiste klicken. Das Programm erscheint im Startmenü bzw. Dock.
+- **iPhone/iPad (Safari):** Adresse öffnen, **Teilen** → **„Zum Home-Bildschirm“**.
+- **Android (Chrome):** Adresse öffnen, Menü **⋮** → **„App installieren“** bzw. „Zum Startbildschirm hinzufügen“.
+
+Die installierte App funktioniert danach auch **ohne Internet**. Ist Internet da, lädt sie Updates automatisch.
+
+### Beim ersten Start
+Unter **Einstellungen** Bankverbindung, E-Mail, Stundensatz und optional Steuernummer und Logo eintragen.
+
+**Wichtig:** Die Daten liegen auf jedem Gerät getrennt. Handy und PC sehen nicht automatisch dieselben Rechnungen. Zum Übertragen unter **Archiv → Sicherung herunterladen** auf dem einen Gerät und **Sicherung einspielen** auf dem anderen.
 
 ## Funktionen
 
@@ -81,4 +93,5 @@ Alle Daten (Einstellungen, Archiv, aktueller Entwurf) liegen **nur im Browser au
 - `app.js`: Formular, Archiv, Speicherung (localStorage)
 - `pdf.js`: PDF-Layout
 - `style.css`: Gestaltung
+- `manifest.webmanifest`, `sw.js`, `icons/`: App-Installation und Offline-Betrieb
 - `vendor/`: [jsPDF](https://github.com/parallax/jsPDF) 2.5.2 und [jsPDF-AutoTable](https://github.com/simonbengtsson/jsPDF-AutoTable) 3.8.4 (MIT-Lizenz), lokal eingebunden, damit alles offline läuft

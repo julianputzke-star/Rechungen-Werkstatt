@@ -23,6 +23,8 @@ body {
 .brand small { font-weight: 400; opacity: .75; margin-left: 6px; }
 nav { display: flex; gap: 4px; }
 .tab { background: transparent; color: #fff; border: 1px solid transparent; }
+.tab.install { border-color: rgba(255,255,255,.5); }
+nav { flex-wrap: wrap; }
 .tab.active { background: rgba(255,255,255,.16); border-color: rgba(255,255,255,.3); }
 main { padding: 16px; max-width: 1700px; margin: 0 auto; }
 .tabpane { display: none; }
