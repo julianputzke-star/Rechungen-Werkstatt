@@ -20,6 +20,7 @@
     email: '', web: '',
     steuernr: '', ustid: '', bank: '', iban: '', bic: '',
     kleinunternehmer: true,
+    absenderzeile: false,
     stundensatz: '95,00',
     mwst: '19',
     zahlungsziel: '14',

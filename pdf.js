@@ -98,13 +98,16 @@
     doc.line(L, 37, R, 37);
 
     // ---------- Anschriftfeld ----------
-    doc.setFontSize(7);
-    doc.setTextColor(...GREY);
-    const absender = [firmaZeile || s.firma, s.strasse, [s.plz, s.ort].filter(Boolean).join(' ')].filter(Boolean).join(' · ');
-    doc.text(absender, L, 50);
-    doc.setLineWidth(0.15);
-    doc.setDrawColor(...GREY);
-    doc.line(L, 51, L + Math.min(doc.getTextWidth(absender), 85), 51);
+    // Kleine Absenderzeile nur bei Versand im Fensterumschlag (in den Einstellungen abschaltbar)
+    if (s.absenderzeile) {
+      doc.setFontSize(7);
+      doc.setTextColor(...GREY);
+      const absender = [firmaZeile || s.firma, s.strasse, [s.plz, s.ort].filter(Boolean).join(' ')].filter(Boolean).join(' · ');
+      doc.text(absender, L, 50);
+      doc.setLineWidth(0.15);
+      doc.setDrawColor(...GREY);
+      doc.line(L, 51, L + Math.min(doc.getTextWidth(absender), 85), 51);
+    }
 
     doc.setTextColor(20);
     doc.setFontSize(10.5);
