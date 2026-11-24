@@ -132,7 +132,7 @@
         <h2>Summen</h2>
         <table class="sums" id="sumTable"></table>
         <div class="actions">
-          <button class="primary" id="btnPdf">PDF herunterladen</button>
+          <button class="primary" id="btnPdf">PDF erstellen &amp; speichern</button>
           <button id="btnSpeichern">Im Archiv speichern</button>
           <button id="btnVorschau">Vorschau aktualisieren</button>
         </div>
@@ -225,6 +225,12 @@
   <p class="muted">Änderungen werden automatisch gespeichert.</p>
 </section>
 </main>
+
+<div id="mobileBar" class="mobilebar">
+  <div><small>Gesamt</small><b id="mobileSumme">0,00 €</b></div>
+  <button id="mBtnSpeichern">Speichern</button>
+  <button class="primary" id="mBtnPdf">PDF erstellen</button>
+</div>
 
 <div id="toast" class="toast"></div>
 

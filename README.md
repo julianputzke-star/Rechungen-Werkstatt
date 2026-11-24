@@ -12,7 +12,7 @@ Ein Rechnungsprogramm für KFZ-Werkstätten. Es läuft komplett im Browser, auch
 ### Variante B: Als App installieren (Computer, Handy, Tablet)
 Dafür muss das Programm unter einer Internetadresse liegen, z. B. über GitHub Pages. Danach:
 - **Windows/Mac (Chrome oder Edge):** Adresse öffnen und oben auf **„⬇ Als App installieren“** oder auf das Installieren-Symbol in der Adressleiste klicken. Das Programm erscheint im Startmenü bzw. Dock.
-- **iPhone/iPad (Safari):** Adresse öffnen, **Teilen** → **„Zum Home-Bildschirm“**.
+- **iPhone/iPad (Safari):** Adresse öffnen, **Teilen** → **„Zum Home-Bildschirm“**. Danach nur noch über das App-Symbol starten, nicht über Safari, denn Safari und die App haben getrennte Daten. „PDF erstellen“ öffnet das Teilen-Menü: **„In Dateien sichern“**, Drucken, Mail oder AirDrop.
 - **Android (Chrome):** Adresse öffnen, Menü **⋮** → **„App installieren“** bzw. „Zum Startbildschirm hinzufügen“.
 
 Die installierte App funktioniert danach auch **ohne Internet**. Ist Internet da, lädt sie Updates automatisch.

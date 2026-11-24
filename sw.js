@@ -1,6 +1,6 @@
 /* Service Worker: hält das Programm offline verfügbar.
    Bei jeder Programmänderung VERSION erhöhen, damit Geräte die neue Fassung laden. */
-const VERSION = 'v3';
+const VERSION = 'v5';
 const CACHE = 'rechnungen-' + VERSION;
 const DATEIEN = [
   './', './index.html', './style.css', './app.js', './pdf.js', './manifest.webmanifest',

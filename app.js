@@ -87,6 +87,7 @@
   $$('.tab').forEach((b) => b.addEventListener('click', () => {
     $$('.tab').forEach((x) => x.classList.toggle('active', x === b));
     $$('.tabpane').forEach((p) => p.classList.toggle('active', p.id === 'tab-' + b.dataset.tab));
+    document.body.className = 'tab-' + b.dataset.tab;
     if (b.dataset.tab === 'archiv') zeigeArchiv();
     if (b.dataset.tab === 'rechnung') vorschauBald();
   }));
@@ -231,6 +232,7 @@
     html += `<tr class="total"><td>${t.klein ? 'Gesamtbetrag' : 'Rechnungsbetrag'}</td><td>${euro(t.brutto)}</td></tr>`;
     if (t.klein) html += '<tr><td colspan="2" class="muted">Kleinunternehmer § 19 UStG – keine Umsatzsteuer</td></tr>';
     $('#sumTable').innerHTML = html;
+    $('#mobileSumme').textContent = euro(t.brutto);
 
     const fehlt = [];
     if (!settings.inhaber) fehlt.push('Vor- und Nachname des Inhabers fehlt (Pflicht: vollständiger Name des Unternehmers) – bitte unter „Einstellungen“ eintragen.');
@@ -270,7 +272,25 @@
     } catch (e) { console.error(e); }
   }
 
+  // Auf iPad/iPhone gibt es keinen Download-Ordner wie am PC. Dort öffnen wir das
+  // Teilen-Menü („In Dateien sichern“, Drucken, Mail, AirDrop …).
+  const istTouchGeraet = () => matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 1;
+
   function herunterladen(blob, name) {
+    const typ = name.endsWith('.pdf') ? 'application/pdf' : 'application/json';
+    if (istTouchGeraet() && navigator.canShare && window.File) {
+      const datei = new File([blob], name, { type: typ });
+      if (navigator.canShare({ files: [datei] })) {
+        navigator.share({ files: [datei], title: name }).catch((e) => {
+          if (e.name !== 'AbortError') dateiLink(blob, name);
+        });
+        return;
+      }
+    }
+    dateiLink(blob, name);
+  }
+
+  function dateiLink(blob, name) {
     // als neutraler Datenstrom, damit der Browser den Dateinamen sicher übernimmt
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([blob], { type: 'application/octet-stream' }));
@@ -302,6 +322,8 @@
     } else vorschau();
   });
   $('#btnSpeichern').addEventListener('click', () => archivieren(false));
+  $('#mBtnSpeichern').addEventListener('click', () => archivieren(false));
+  $('#mBtnPdf').addEventListener('click', () => $('#btnPdf').click());
 
   function archivieren(still) {
     if (inv.kleinunternehmer === undefined) { inv.kleinunternehmer = !!settings.kleinunternehmer; inv.mwst = settings.mwst; }
@@ -506,6 +528,7 @@
   window.addEventListener('appinstalled', () => toast('App installiert – sie ist jetzt auf dem Startbildschirm bzw. im Startmenü.'));
 
   // ---------- Start ----------
+  document.body.className = 'tab-rechnung';
   inv = lade(KEY_ENTWURF, null) || neueRechnung();
   ['arbeiten', 'teile', 'sonstiges'].forEach((k) => { if (!Array.isArray(inv[k])) inv[k] = []; });
   einstellungenFuellen();
