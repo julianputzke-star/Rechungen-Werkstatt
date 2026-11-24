@@ -24,6 +24,7 @@ body {
 nav { display: flex; gap: 4px; }
 .tab { background: transparent; color: #fff; border: 1px solid transparent; }
 .tab.install { border-color: rgba(255,255,255,.5); }
+.tab.reload { font-size: 20px; line-height: 1; padding: 6px 12px; margin-left: 6px; border-color: rgba(255,255,255,.35); }
 nav { flex-wrap: wrap; }
 .tab.active { background: rgba(255,255,255,.16); border-color: rgba(255,255,255,.3); }
 main { padding: 16px; max-width: 1700px; margin: 0 auto; }
