@@ -85,8 +85,8 @@
   }
 
   // ---------- Tabs ----------
-  $$('.tab').forEach((b) => b.addEventListener('click', () => {
-    $$('.tab').forEach((x) => x.classList.toggle('active', x === b));
+  $$('.tab[data-tab]').forEach((b) => b.addEventListener('click', () => {
+    $$('.tab[data-tab]').forEach((x) => x.classList.toggle('active', x === b));
     $$('.tabpane').forEach((p) => p.classList.toggle('active', p.id === 'tab-' + b.dataset.tab));
     document.body.className = 'tab-' + b.dataset.tab;
     if (b.dataset.tab === 'archiv') zeigeArchiv();
@@ -531,6 +531,16 @@
   const entwurfJetzt = () => { clearTimeout(entwurfTimer); speichere(KEY_ENTWURF, inv); };
   window.addEventListener('pagehide', entwurfJetzt);
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') entwurfJetzt(); });
+  // Neu-laden-Knopf (in der installierten App gibt es keinen Neu-laden-Knopf des Browsers)
+  $('#btnReload').addEventListener('click', async () => {
+    if (!confirm('Seite neu laden?\n\nDie aktuelle Rechnung bleibt als Entwurf gespeichert. Dabei wird auch geprüft, ob eine neue Programmversion verfügbar ist.')) return;
+    entwurfJetzt();
+    try {
+      const reg = navigator.serviceWorker && await navigator.serviceWorker.getRegistration();
+      if (reg) await Promise.race([reg.update(), new Promise((r) => setTimeout(r, 3000))]);
+    } catch (e) { /* offline – einfach neu laden */ }
+    location.reload();
+  });
   let installEvent = null;
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
